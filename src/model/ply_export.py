@@ -33,6 +33,11 @@ def export_ply(
     shift_and_scale: bool = False,
     save_sh_dc_only: bool = True,
 ):
+    # bug fix according to https://github.com/InternRobotics/AnySplat/issues/51
+    def inverse_sigmoid(x):
+        return torch.log(x / (1 - x))
+
+    opacities = inverse_sigmoid(opacities)
     if shift_and_scale:
         # Shift the scene so that the median Gaussian is at the origin.
         means = means - means.median(dim=0).values

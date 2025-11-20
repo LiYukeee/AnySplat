@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+import os
+# Define the local model path
+LOCAL_MODEL_PATH = os.path.join(os.path.dirname(__file__), "pretrain_model")
+
+from src.system_utils import autoChooseCudaDevice
+autoChooseCudaDevice()
+
 import functools
 import gc
 import os
@@ -83,7 +90,7 @@ def handle_uploads(input_video, input_images):
 
     # Create a unique folder name
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    target_dir = f"input_images_{timestamp}"
+    target_dir = f"outputs_anysplat/input_images_{timestamp}"
     target_dir_images = os.path.join(target_dir, "images")
 
     # Clean up if somehow that folder already exists
@@ -197,14 +204,19 @@ def clear_fields():
 
 
 if __name__ == "__main__":
+    # Set Gradio temporary directory to avoid permission issues
+    gradio_cache_dir = os.path.join(os.path.dirname(__file__), ".gradio_cache")
+    os.makedirs(gradio_cache_dir, exist_ok=True)
+    os.environ["GRADIO_TEMP_DIR"] = gradio_cache_dir
+    
     server_name = "127.0.0.1"
     server_port = None
     share = True
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
-    # Load model
+    # Load model from local path
     model = AnySplat.from_pretrained(
-        "lhjiang/anysplat"
+        LOCAL_MODEL_PATH
     )
     model = model.to(device)
     model.eval()

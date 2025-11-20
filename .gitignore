@@ -1,3 +1,7 @@
+# custom .gitignore for Python projects
+pretrain_model/
+.gradio_cache/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
